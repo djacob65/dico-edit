@@ -1,0 +1,225 @@
+<?php
+
+require_once('config.inc');
+
+$upload_mode = (strlen($USER) && $USER === 'admin') ? 'inline' : 'none';
+
+// Sort a Multi-dimensional Array by Value
+function aasort (&$array, $key) {
+    $sorter = array();
+    $ret = array();
+    reset($array);
+	$id = abs(intval($key))-1;
+    foreach ($array as $ii => $va) {
+        $sorter[$ii] = $va[$id];
+    }
+    asort($sorter);
+    foreach ($sorter as $ii => $va) {
+        $ret[$ii] = $array[$ii];
+    }
+	if(intval($key)<0) $array = array_reverse($ret);
+	else               $array = $ret;
+}
+
+// PHP function to read TSV/CSV file to an array
+function xsvToArray($xsv, $header=false, $sep="\t")
+{
+    $xsvArray =array();
+    if (($xsvToRead = fopen($xsv, 'r')) !== FALSE) {
+        if ($header) $line = fgets($xsvToRead, 1000);
+        while (! feof($xsvToRead)) {
+            $data = fgetcsv($xsvToRead, 1000, $sep);
+            if (gettype($data)==='array') {
+                $xsvArray[] = array_map("utf8_encode", $data);
+            }
+            if (gettype($data)==='string') {
+                $xsvArray[] = utf8_encode($data);
+            }
+        }
+        fclose($xsvToRead);
+    }
+    return $xsvArray;
+}
+
+?>
+
+<!DOCTYPE html>
+<html lang="fr" >
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+	<title>Dictionary edition</title>
+
+	<!-- Font -->
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Roboto+Flex:wght@400&display=swap" rel="stylesheet">
+
+	<!-- CSS -->
+	<link rel="stylesheet" href="<?php echo $PATH ?>css/bootstrap.min.css">
+	<link rel="stylesheet" href="<?php echo $PATH ?>css/edit.css">
+	<style>::-webkit-scrollbar{ width: 5px; }</style>
+
+	<!-- JS -->
+	<script src="<?php echo $PATH ?>js/jquery.min.js"></script>
+	<script  src="<?php echo $PATH ?>js/edit.js"></script>
+
+	<script type="text/javascript">
+	$(document).ready(function() {
+		document.getElementById("searchterm" ).addEventListener("input", function(e) {
+			select_row( this.value );
+		});
+	});
+	</script>
+</head>
+
+<body>
+
+<h1>Dictionary edition</h1>
+<br>
+
+<section>
+	<div style="padding-bottom: 10px;"><div id="errbox" name="errbox" class="msgbox errbox">
+		 <div style="margin-left: 2rem; margin-top: 1rem; margin-bottom: 0rem;">
+				<span id="errboxmsg">Error !!!</span></p>
+		 </div>
+	</div></div>
+	<table><tr>
+	<td><div id="divsearch" class="divsearch" style="padding: 1px; display: none"><b>Search</b>:&nbsp;<input class="searchterm" id="searchterm" value=""></div></td>
+	<td>&nbsp;&nbsp;&nbsp;&nbsp;<span id="savemsg" class="savemsg"></span></td>
+	</tr></table>
+	<div id="tbl-main" name="tbl-main" class="tbl-main tableFixHead"></div>
+	<div id="dico-name" style="display: none;"></div>
+	<br>
+	<div id="tbl-footer" style="display: none;">
+		<span style="font-size: small; font-style: italic;">(*) mandatory fields</span>
+		<br><br>
+		<div>
+			<button type="button" class="btn btn-primary btn-xs" onclick="downloadFile('<? echo $dico_file ?>');">Download as a TSV file</button>
+			<button type="button" class="btn btn-primary btn-xs" style="display: <? echo $upload_mode ?>;" onclick="$('#uploadDico').click();">Upload a TSV file</button>
+			<input type="file" id="uploadDico" style="display: none;" />
+		</div>
+		<br>
+		<div style="padding-bottom: 10px;">
+			<div id="errvalid" name="errvalid" class="errvalid">
+				<div style="margin-left: 1rem; margin-top: 1rem; margin-bottom: 0rem;"><p><button class="btn btn-errvalid">X</button>&nbsp;&nbsp;<span id="errvalidmsg">Error Validation</span></p></div>
+			</div>
+		</div>
+	</div-->
+</section>
+
+<?php
+do {
+
+	# No user
+	if (strlen($USER)==0) break;
+
+	// Get the dictionary name from the url otherwise keep the default one
+	if (isset($_GET['dico'])) $DICOSEL=$_GET['dico'];
+
+	// Get the column number to be sorted from the url otherwise keep the default one
+	if (isset($_GET['sort'])) $SORTCOL=$_GET['sort'];
+
+	// Get the search term from the url if specified
+	$searchterm=''; if (isset($_GET['search'])) $searchterm=$_GET['search'];
+
+	// Test if Dictionary format file exists
+	$format_file=$CVDIR.$DICOSEL.'/'.$DICOSEL.'_format.'.$EXT;
+	if (! is_file($format_file)) {
+		$msg='Error: '.$format_file.' does not exist !!!';
+		echo "<script>$('#errboxmsg').html('".$msg."'); $('#errbox').css('display','block');</script>";
+		break;
+	}
+
+	// Read Dictionary format file
+   $format = xsvToArray($format_file, true, $SEP);
+	if (! count($format)) {
+		$msg='Error: '.$format_file.' is empty !!!';
+		echo "<script>$('#errboxmsg').html('".$msg."'); $('#errbox').css('display','block');</script>";
+		break;
+	}
+
+	// Test if Dictionary file exists
+	$dico_file=$CVDIR.$DICOSEL.'/'.$DICOSEL.'.'.$EXT;
+	if (! is_file($dico_file)) {
+		$msg='Error: '.$dico_file.' does not exist !!!';
+		echo "<script>$('#errboxmsg').html('".$msg."'); $('#errbox').css('display','block');</script>";
+		break;
+	}
+
+	// Read Dictionary file
+	$dico = xsvToArray($dico_file, false, $SEP);
+	if (! count($dico)) {
+		$msg='Error: '.$dico_file.' is empty !!!';
+		echo "<script>$('#errboxmsg').html('".$msg."'); $('#errbox').css('display','block');</script>";
+		break;
+	}
+
+	// Test if the number of rows in the format is the same for the number of columns in the dictionary
+	$nbrow = count($format);
+	$nbcol = array_map("count", $dico)[0];
+	if ($nbrow !== $nbcol) {
+		$msg='Error: the columns count ('.$nbcol.') of '.$dico_file.' is not the same as the row count ('.$nbrow.') of '.$format_file.' !!!';
+		echo "<script>$('#errboxmsg').html('".$msg."'); $('#errbox').css('display','block');</script>";
+		break;
+	}
+
+	// Sort dictionary
+	aasort($dico, $SORTCOL);
+
+	// Build the HTML Table
+
+	// thead
+	$var1=$var2=$var3=''; $sep='';
+	$html_thread = '<thead class="thread-light"><tr>';
+	$url = basename($_SERVER['SCRIPT_NAME']).'?dico='.$DICOSEL.'&sort=';
+
+	$cnt=0;
+	foreach($format as $line) {
+		$req=0; $star='';
+		if ($line[1] === 'Y') { $req=1; $star=' (*)'; }
+		$var1 .= $sep."'".$line[0]."'"; $var2 .= $sep."'".$req."'";  $var3 .= $sep.$line[2];
+		$cnt++;
+		$scol=$cnt; if ($SORTCOL>0 && abs($SORTCOL)==$cnt) $scol=-$cnt;
+		$html_thread .= '<th class="tablehead"><a href="javascript:getsort(\\\''.$url.$scol.'\\\');">'.$line[0].'</a>'.$star.'</th>';
+		$sep=',';
+	}
+	if ($USER === 'admin') $html_thread .= '<th class="tablehead tbl-btn" style="width: 140px;"><button class="add">Add new</button></th>';
+	$html_thread .= '</tr></thead>';
+
+	// tbody
+	$html_tbody ="<tbody id=\"container\">";
+	$cnt=0;
+	foreach($dico as $line) {
+		$html_tbody .="<tr id=\"line".$cnt."\">";
+		foreach($line as $info) {
+			if (preg_match('/^http/',$info)) { # URL
+				$html_tbody .= '<td class="data"><a target=\"_blank\" href=\"'.$info.'\">'.$info.'</a></td>';
+			} elseif (preg_match('/^\d{4}-\d{4}-\d{4}-\d{3}[0-9|X]$/',$info)) { # ORCID
+				$html_tbody .= '<td class="data"><a target=\"_blank\" href=\"https://orcid.org/'.$info.'\">'.$info.'</a></td>';
+			} else {
+				$html_tbody .= '<td class="data">'.$info.'</td>';
+			}
+		}
+		if ($USER === 'admin') $html_tbody .= '<td class="td-btn"><button class="btn save">Save</button><button class="btn edit">Edit</button>&nbsp;<button class="btn delete">Del</button><button class="btn cancel">Cancel</button></td></tr>';
+		$cnt++;
+	}
+	$html_tbody .="</tbody>";
+
+    # enough elements for the search to be relevant
+	if ($cnt>10) $dispsearch='block'; else $dispsearch='none';
+
+	// the full HTML table
+	$html_table='<table id="mytable" name="mytable" class="table data" style="margin-bottom: 0rem;">'.$html_thread.$html_tbody.'</table>';
+
+	// Write
+	echo "<script>var nameArray = [ ".$var1." ];\nvar requireArray = [ ".$var2." ];\nvar regexArray = [ ".$var3." ];\n $('#tbl-main').html('".$html_table."'); $('#dico-name').html('".$DICOSEL."');$('#divsearch').css('display','".$dispsearch."');$('#tbl-footer').css('display','block');$('#searchterm').val('".$searchterm."');select_row('".$searchterm."');</script>";
+
+    // if admin user then authorize to upload a file to replace the current dictionary
+    if ($USER == 'admin')
+		echo "<script>uploadDico.addEventListener('change', function(){ $('#savemsg').html(''); postDico(this.files[0]); })</script>";
+
+} while(0);
+
+
+?>

@@ -1,0 +1,268 @@
+/*  Begin: Inline Edit Table */
+
+:root {
+	--font-family: 'Roboto Flex', sans-serif;
+	--btn-color: #edf1f6;
+	--text-color: #354082;
+	--btn-menu-color: #fff;
+	--btn-menu-bg: #b14652;
+}
+
+body {
+	margin: 2em auto;
+	margin-top: 0rem;
+	max-width: 1350px;
+	color:#666;
+	background:#ffffff;
+	padding:20px;
+	min-height: 100vh;
+	display: flex;
+	flex-direction: column;
+	font-family: var(--font-family);
+	display: block;
+	min-height: 100%;
+}
+
+footer {
+  position: absolute;
+  bottom: 120px;
+  width:65%;
+}
+
+h1 {font-size:24px; font-weight:normal; text-align:center; color:#337ab7}
+h2 {font-size:20px; font-weight:normal; text-align:left; color:#c52d0d}
+h3 {font-size:19px; font-weight:normal; text-align:left; color: #009688; font-weight: bold;}
+h4 {font-size:19px; font-weight:normal; text-align:left; color:#388e3c}
+em {font-size:12px;}
+
+input {
+  border: 1px solid #eeeaea; /* transparent; */
+  padding: 5px;
+  font-size: 16px;
+  width: 100%;
+}
+
+.table th {
+	padding: 0.5rem;
+}
+
+.table .thead-light th {
+	padding-left: 0.25cm; /* To align with section title */
+	border-radius: 10px 10px 0px 0px;
+	border-color: #fff;
+	background-color: #c2d5e9;
+	color: #585894;
+	vertical-align: middle;
+	/*text-align: center;*/
+}
+
+.table .thead-view th {
+	background-color: #c2d5e9;
+	color: #585894;
+}
+
+.table th td {
+	border-color-rigth: #fafafa;
+}
+
+.table td, .table th {
+	padding: 0.5rem;
+	vertical-align: top;
+	border-top: 1px solid #dee2e6;
+	border-right: 1px solid #dee2e6;
+	border-left: 1px solid #dee2e6;
+	border-bottom: 0px solid #dee2e6;
+}
+
+th, td {
+	padding-top: 4px;
+	padding-bottom: 4px;
+}
+
+.tablehead {
+  background: #7693a0; /*#607d8b;*/
+  text-transform: uppercase;
+  vertical-align: top;
+  color: #fff;
+  font-weight: bold;
+  text-align: left;
+}
+
+.tablehead a {
+  color: white;
+}
+
+.tablehead a:hover {
+  text-decoration: none;
+}
+
+.tbl-btn {
+  min-width: 120px;
+}
+
+.tbl-main {
+  max-height: 400px;
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
+
+.tableFixHead {
+    overflow: auto;
+    height: 400px;
+}
+
+.tableFixHead thead th { 
+    position: sticky;
+    top: -1px; z-index: 1;
+    border-radius: 10px 10px 0px 0px;
+    vertical-align: middle;
+    /*border-color: #fff;
+    background-color: #c2d5e9;
+    color: #495057;*/
+}
+
+.msgbox {
+	display: none;
+	color: #fff;
+	font-weight: bold;
+	border-radius: 15px;
+	border-top: 1px solid #dee2e6;
+	border-right: 1px solid #dee2e6;
+	border-left: 1px solid #dee2e6;
+	border-bottom: 1px solid #dee2e6;
+}
+
+.errbox {
+	background: #c47c86;
+}
+
+.searchterm {
+  width: 300px;
+}
+
+.errvalid {
+  display: none;
+  background: #c47c86;;
+  color: #fff;
+  font-weight: bold;
+  border-radius: 15px;
+  border-top: 1px solid #dee2e6;
+  border-right: 1px solid #dee2e6;
+  border-left: 1px solid #dee2e6;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.btn {
+	border: 0px solid #fff;
+	border-radius: 0.35rem;
+}
+
+.btn-primary {
+	color: var(--text-color);
+	background-color: var(--btn-color);
+	border-color: var(--btn-color);
+}
+
+.btn-primary:hover, .btn-primary:active,{
+	border-color: var(--btn-color);
+}
+
+.btn-errvalid {
+  background: #EC5840;
+  color: #ffffff;
+  font-weight: 400;
+  padding: 0.2rem 0.75rem;
+  font-size: 1rem;
+  font-weight: bold;
+  line-height: 1.5;
+  border-radius: 0.25rem;
+}
+
+.add, .edit, .save, .delete, .cancel {
+  outline: none;
+  background: none;
+  border: none;
+}
+
+.edit, .save, .delete, .cancel {
+  padding: 5px 10px;
+  cursor: pointer;
+  font-size: smaller;
+}
+
+.add {
+  float: right;
+  background: transparent;
+  border: 1px solid #ffffff;
+  color: #ffffff;
+  font-size: 13px;
+  padding: 0;
+  padding: 3px 5px;
+  cursor: pointer;
+}
+.add:hover {
+  background: #ffffff;
+  color: #00adee;
+}
+
+.save {
+  display: none;
+  background: #32AD60;
+  color: #ffffff;
+}
+.save:hover {
+  background: #27854a;
+}
+
+.edit {
+  background: #2199e8;
+  color: #ffffff;
+}
+.edit:hover {
+  background: #147dc2;
+}
+
+.delete {
+  background: #EC5840;
+  color: #ffffff;
+}
+.delete:hover {
+  background: #e23317;
+}
+
+.cancel {
+  display: none;
+  background: #ec9740;;
+  color: #ffffff;
+}
+.cancel:hover {
+  background: #de760b;;
+}
+
+.btn-send {
+  background-color: #557ca7;
+  border-color: white;
+}
+
+/* width */
+::-webkit-scrollbar {
+	width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+    background: #fff;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+	background: #5a90d3;
+	border-radius: 10px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+	background: #607d8b;
+}
+
+/*  End: Inline Edit Table */
