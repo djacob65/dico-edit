@@ -1,6 +1,6 @@
 <?php
 
-require_once('config.inc');
+require_once('inc/config.inc');
 
 $upload_mode = (strlen($USER) && $USER === 'admin') ? 'inline' : 'none';
 
@@ -111,7 +111,7 @@ function xsvToArray($xsv, $header=false, $sep="\t")
 <?php
 do {
 
-	# No user
+	// No user
 	if (strlen($USER)==0) break;
 
 	// Get the dictionary name from the url otherwise keep the default one
@@ -132,7 +132,7 @@ do {
 	}
 
 	// Read Dictionary format file
-   $format = xsvToArray($format_file, true, $SEP);
+	$format = xsvToArray($format_file, true, $SEP);
 	if (! count($format)) {
 		$msg='Error: '.$format_file.' is empty !!!';
 		echo "<script>$('#errboxmsg').html('".$msg."'); $('#errbox').css('display','block');</script>";
@@ -206,7 +206,7 @@ do {
 	}
 	$html_tbody .="</tbody>";
 
-    # enough elements for the search to be relevant
+	// enough elements for the search to be relevant
 	if ($cnt>10) $dispsearch='block'; else $dispsearch='none';
 
 	// the full HTML table
