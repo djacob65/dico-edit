@@ -1,6 +1,6 @@
 <?php
 
-require_once('inc/config.inc');
+require_once('config.inc');
 
 $upload_mode = (strlen($USER) && $USER === 'admin') ? 'inline' : 'none';
 
@@ -57,11 +57,14 @@ function xsvToArray($xsv, $header=false, $sep="\t")
 
 	<!-- CSS -->
 	<link rel="stylesheet" href="<?php echo $PATH ?>css/bootstrap.min.css">
+	<link rel="stylesheet" href="<?php echo $PATH ?>css/ror-widget.css">
 	<link rel="stylesheet" href="<?php echo $PATH ?>css/edit.css">
 	<style>::-webkit-scrollbar{ width: 5px; }</style>
 
 	<!-- JS -->
-	<script src="<?php echo $PATH ?>js/jquery.min.js"></script>
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	<script  src="<?php echo $PATH ?>js/typeahead.min.js"></script>
+	<script  src="<?php echo $PATH ?>js/ror-typeahead.js"></script>
 	<script  src="<?php echo $PATH ?>js/edit.js"></script>
 
 	<script type="text/javascript">
@@ -111,7 +114,7 @@ function xsvToArray($xsv, $header=false, $sep="\t")
 <?php
 do {
 
-	// No user
+	# No user
 	if (strlen($USER)==0) break;
 
 	// Get the dictionary name from the url otherwise keep the default one
@@ -132,7 +135,7 @@ do {
 	}
 
 	// Read Dictionary format file
-	$format = xsvToArray($format_file, true, $SEP);
+   $format = xsvToArray($format_file, true, $SEP);
 	if (! count($format)) {
 		$msg='Error: '.$format_file.' is empty !!!';
 		echo "<script>$('#errboxmsg').html('".$msg."'); $('#errbox').css('display','block');</script>";
@@ -173,11 +176,13 @@ do {
 	$var1=$var2=$var3=''; $sep='';
 	$html_thread = '<thead class="thread-light"><tr>';
 	$url = basename($_SERVER['SCRIPT_NAME']).'?dico='.$DICOSEL.'&sort=';
+
 	$cnt=0;
 	foreach($format as $line) {
 		$req=0; $star='';
 		if ($line[1] === 'Y') { $req=1; $star=' (*)'; }
 		$var1 .= $sep."'".$line[0]."'"; $var2 .= $sep."'".$req."'";  $var3 .= $sep.$line[2];
+		$var4 .= (count($line)>3) ? $sep."'".$line[3]."'" : $sep."''" ;
 		$cnt++;
 		$scol=$cnt; if ($SORTCOL>0 && abs($SORTCOL)==$cnt) $scol=-$cnt;
 		$html_thread .= '<th class="tablehead"><a href="javascript:getsort(\\\''.$url.$scol.'\\\');">'.$line[0].'</a>'.$star.'</th>';
@@ -191,35 +196,36 @@ do {
 	$cnt=0;
 	foreach($dico as $line) {
 		$html_tbody .="<tr id=\"line".$cnt."\">";
+		$col=0;
 		foreach($line as $info) {
 			if (preg_match('/^http/',$info)) { # URL
-				$html_tbody .= '<td class="data"><a target=\"_blank\" href=\"'.$info.'\">'.$info.'</a></td>';
+				$html_tbody .= '<td class="data" id=\"col'.$col.'\"><a target=\"_blank\" href=\"'.$info.'\">'.$info.'</a></td>';
 			} elseif (preg_match('/^\d{4}-\d{4}-\d{4}-\d{3}[0-9|X]$/',$info)) { # ORCID
-				$html_tbody .= '<td class="data"><a target=\"_blank\" href=\"https://orcid.org/'.$info.'\">'.$info.'</a></td>';
+				$html_tbody .= '<td class="data" id=\"col'.$col.'\"><a target=\"_blank\" href=\"https://orcid.org/'.$info.'\">'.$info.'</a></td>';
 			} else {
-				$html_tbody .= '<td class="data">'.$info.'</td>';
+				$html_tbody .= '<td class="data" id=\"col'.$col.'\">'.$info.'</td>';
 			}
+			$col++;
 		}
 		if ($USER === 'admin') $html_tbody .= '<td class="td-btn"><button class="btn save">Save</button><button class="btn edit">Edit</button>&nbsp;<button class="btn delete">Del</button><button class="btn cancel">Cancel</button></td></tr>';
 		$cnt++;
 	}
 	$html_tbody .="</tbody>";
 
-	// If enough elements for the search to be relevant
+    # enough elements for the search to be relevant
 	if ($cnt>10) $dispsearch='block'; else $dispsearch='none';
 
-	// The full HTML table
+	// the full HTML table
 	$html_table='<table id="mytable" name="mytable" class="table data" style="margin-bottom: 0rem;">'.$html_thread.$html_tbody.'</table>';
 
-	// Write in the HTML document
-	echo "<script>var nameArray = [ ".$var1." ];\nvar requireArray = [ ".$var2." ];\nvar regexArray = [ ".$var3." ];\n $('#tbl-main').html('".$html_table."'); $('#dico-name').html('".$DICOSEL."');$('#divsearch').css('display','".$dispsearch."');$('#tbl-footer').css('display','block');$('#searchterm').val('".$searchterm."');select_row('".$searchterm."');</script>";
+	// Write
+	echo "<script>var nameArray = [ ".$var1." ];\nvar requireArray = [ ".$var2." ];\nvar regexArray = [ ".$var3." ];\nvar apiArray = [ ".$var4." ];\nvar nbitems=".$cnt."\n $('#tbl-main').html('".$html_table."'); $('#dico-name').html('".$DICOSEL."');$('#divsearch').css('display','".$dispsearch."');$('#tbl-footer').css('display','block');$('#searchterm').val('".$searchterm."');select_row('".$searchterm."');</script>";
 
-	// If admin user then authorize to upload a file to replace the current dictionary
-	if ($USER == 'admin')
+    // if admin user then authorize to upload a file to replace the current dictionary
+    if ($USER == 'admin')
 		echo "<script>uploadDico.addEventListener('change', function(){ $('#savemsg').html(''); postDico(this.files[0]); })</script>";
 
 } while(0);
 
-?>
 
-</body></html>
+?>
